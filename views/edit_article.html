@@ -1,0 +1,24 @@
+{{define "body"}}
+    <h1>Editing article "{{.Title}}"</h1>
+
+    <form method="post">
+        <p>
+            <label for="title">Title</label>
+            <input value="{{.Title}}" type="text" name="title" id="title">
+        </p>
+
+        <p>
+            <label for="slug">Slug</label>
+            <input value="{{.Slug}}" type="text" name="slug" id="slug">
+        </p>
+
+        <p>
+            <label for="content">Content</label>
+            <textarea name="content" id="content" cols="30" rows="10">{{.Content}}</textarea>
+        </p>
+
+        <p>
+            <input type="submit" value="Submit">
+        </p>
+    </form>
+{{end}}

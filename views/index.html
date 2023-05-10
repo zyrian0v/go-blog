@@ -1,0 +1,15 @@
+{{define "body"}}
+    <p>{{.Intro}}</p>
+        {{range $k, $v :=  .Articles}}
+        <h4>
+            <a href="/articles/view/{{$k}}">
+                {{$v.Title}}
+            </a>
+        </h4>
+        {{$l := len $v.Content}}
+        <div>
+            {{printf "%.300s" $v.Content}}
+            {{- if gt $l 300}}...{{end}} 
+        </div>
+        {{end}}
+{{end}}
