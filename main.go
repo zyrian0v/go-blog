@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"blog-try/db"
 	"github.com/gosimple/slug"
 )
 
@@ -40,6 +41,10 @@ Nullam vel metus at odio eleifend maximus quis non nisl. Praesent efficitur plac
 }
 
 func main() {
+	// Database
+	db.InitializeHandle()
+	db.ApplySchema()
+
 	// Routes
 	fileServer := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
@@ -60,7 +65,7 @@ func main() {
 	http.Handle(editArticleRoute, editArticle)
 
 	log.Println("serving on :8080")
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 type IndexView struct {
