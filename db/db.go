@@ -71,3 +71,9 @@ func EditArticle(slug string, a Article) (err error) {
 	_, err = handle.Exec(stmt, a.Title, a.Slug, a.Content, slug)
 	return
 }
+
+func DeleteArticle(slug string) (err error) {
+	stmt := "DELETE FROM articles WHERE slug = ?"
+	_, err = handle.Exec(stmt, slug)
+	return
+}
