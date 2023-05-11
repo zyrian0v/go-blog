@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -9,26 +8,13 @@ import (
 	"strings"
 
 	"blog-try/db"
-	"github.com/gosimple/slug"
+	slugify "github.com/gosimple/slug"
 )
 
-type Article struct {
-	Title   string
-	Content string
-}
-
-func (a Article) Validate() error {
-	if a.Title == "" {
-		return errors.New("validate article: title cant be empty")
-	}
-
-	return nil
-}
-
-var articles = map[string]Article{
-	"hello":          {"Hello!", "Hello, World!"},
-	"second-article": {"Second article", "Hello, Second!"},
-	"third-article": {"Third article!", `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris dignissim eget enim et lobortis. Proin finibus, neque non tincidunt interdum, magna arcu posuere risus, eget consequat urna dolor a nunc. Pellentesque blandit arcu quis suscipit accumsan. Pellentesque ultricies pulvinar commodo. Sed placerat mollis risus, quis mollis libero ornare quis. Donec non ante vitae ipsum aliquet consectetur. Nunc venenatis fringilla consectetur.
+var articles = map[string]db.Article{
+	"hello":          {"one", "Hello!", "Hello, World!"},
+	"second-article": {"two", "Second article", "Hello, Second!"},
+	"third-article": {"three", "Third article!", `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris dignissim eget enim et lobortis. Proin finibus, neque non tincidunt interdum, magna arcu posuere risus, eget consequat urna dolor a nunc. Pellentesque blandit arcu quis suscipit accumsan. Pellentesque ultricies pulvinar commodo. Sed placerat mollis risus, quis mollis libero ornare quis. Donec non ante vitae ipsum aliquet consectetur. Nunc venenatis fringilla consectetur.
 
 Phasellus pharetra malesuada condimentum. Nam quis velit feugiat, efficitur urna finibus, egestas neque. Praesent euismod ligula non ex lobortis lacinia. Morbi viverra ac est vitae semper. Aliquam pulvinar tristique condimentum. Cras lorem ante, suscipit non efficitur et, pharetra nec risus. Proin ac augue urna. Sed a urna quis purus sagittis sollicitudin eget quis metus. Ut posuere eleifend tortor, non iaculis risus bibendum id. Morbi augue metus, tristique vel feugiat at, cursus sit amet leo.
 
@@ -69,48 +55,59 @@ func main() {
 }
 
 type IndexView struct {
-	Articles map[string]Article
+	Articles []db.Article
 	Intro    string
 }
 
 func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("root page")
 
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	articles, err := db.GetAllArticles()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	v.Articles = articles
 	files := []string{
 		"views/layout.html",
 		"views/index.html",
 	}
+
 	tmpl := template.Must(template.ParseFiles(files...))
-	err := tmpl.Execute(w, v)
-	if err != nil {
+	if err := tmpl.Execute(w, v); err != nil {
 		log.Println(err)
+		return
 	}
 }
 
 type ShowArticleView struct {
-	Slug string
-	Article
+	db.Article
 }
 
 func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	v.Slug = strings.TrimSuffix(r.URL.Path, "/")
-	log.Printf("show '%v'", v.Slug)
+	slug := strings.TrimSuffix(r.URL.Path, "/")
+	log.Printf("show '%v'", slug)
 
 	files := []string{
 		"views/layout.html",
 		"views/article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
-	article, ok := articles[v.Slug]
-	if !ok {
+
+	a, err := db.GetArticleBySlug(slug)
+	if err != nil {
 		http.NotFound(w, r)
+		log.Println(err)
 		return
 	}
-	v.Article = article
+	v.Article = a
 
-	err := tmpl.Execute(w, v)
-	if err != nil {
+	if err := tmpl.Execute(w, v); err != nil {
 		log.Println(err)
 	}
 }
@@ -121,18 +118,21 @@ func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("new article")
 
 	if r.Method == "POST" {
-		a := Article{
+		a := db.Article{
 			Title:   r.FormValue("title"),
+			Slug:    slugify.Make(r.FormValue("title")),
 			Content: r.FormValue("content"),
 		}
-		err := a.Validate()
-		if err != nil {
+		if err := a.Validate(); err != nil {
 			fmt.Fprint(w, err)
 			return
 		}
 
-		slug := slug.Make(a.Title)
-		articles[slug] = a
+		err := db.AddArticle(a)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 		return
 	}
@@ -142,43 +142,36 @@ func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"views/new_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
-
-	err := tmpl.Execute(w, v)
-	if err != nil {
+	if err := tmpl.Execute(w, v); err != nil {
 		log.Println(err)
 	}
 }
 
 type EditArticleView struct {
-	Slug string
-	Article
+	db.Article
 }
 
 func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	v.Slug = strings.TrimSuffix(r.URL.Path, "/")
-	log.Printf("edit '%v'", v.Slug)
+	slug := strings.TrimSuffix(r.URL.Path, "/")
+	log.Printf("edit '%v'", slug)
 
 	if r.Method == "POST" {
-		title := r.FormValue("title")
-		if title == "" {
-			fmt.Fprint(w, "title cant be empty")
+		a := db.Article{
+			Title:   r.FormValue("title"),
+			Slug:    r.FormValue("slug"),
+			Content: r.FormValue("content"),
+		}
+		if err := a.Validate(); err != nil {
+			fmt.Fprint(w, err)
 			return
 		}
-		slug := r.FormValue("slug")
-		if slug == "" {
-			fmt.Fprint(w, "slug cant be empty")
-			return
-		}
-		_, exists := articles[slug]
-		if exists && v.Slug != slug {
-			fmt.Fprint(w, "article with this slug already exists")
-			return
-		}
-		content := r.FormValue("content")
 
-		delete(articles, v.Slug)
-		articles[slug] = Article{title, content}
-		http.Redirect(w, r, "/articles/view/"+slug, http.StatusMovedPermanently)
+		err := db.EditArticle(slug, a)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
 	}
 
 	files := []string{
@@ -187,15 +180,15 @@ func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 
-	article, ok := articles[v.Slug]
-	if !ok {
+	a, err := db.GetArticleBySlug(slug)
+	if err != nil {
 		http.NotFound(w, r)
+		log.Println(err)
 		return
 	}
-	v.Article = article
+	v.Article = a
 
-	err := tmpl.Execute(w, v)
-	if err != nil {
+	if err := tmpl.Execute(w, v); err != nil {
 		log.Println(err)
 	}
 }
