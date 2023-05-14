@@ -2,10 +2,9 @@ package db
 
 import (
 	"database/sql"
-	"os"
 	"log"
+	"os"
 	_ "rsc.io/sqlite"
-
 )
 
 var handle *sql.DB
@@ -33,7 +32,7 @@ func ApplySchema() {
 }
 
 func GetAllArticles() (as []Article, err error) {
-	stmt := "SELECT title, slug, content FROM articles"
+	stmt := "SELECT title, slug, content FROM articles ORDER BY created_at DESC"
 	rows, err := handle.Query(stmt)
 	if err != nil {
 		return
@@ -42,11 +41,11 @@ func GetAllArticles() (as []Article, err error) {
 
 	for rows.Next() {
 		a := Article{}
-		rows.Scan(&a.Title ,&a.Slug, &a.Content)
+		rows.Scan(&a.Title, &a.Slug, &a.Content)
 		as = append(as, a)
 	}
 	err = rows.Err()
-	
+
 	return
 }
 
@@ -57,7 +56,7 @@ func GetArticleBySlug(slug string) (a Article, err error) {
 }
 
 func AddArticle(a Article) (err error) {
-	stmt := `INSERT INTO articles (title, slug, content) VALUES (?, ?, ?)`
+	stmt := `INSERT INTO articles (title, slug, content, created_at) VALUES (?, ?, ?, datetime('now', 'localtime'))`
 	_, err = handle.Exec(stmt, a.Title, a.Slug, a.Content)
 	return
 }

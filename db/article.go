@@ -6,10 +6,9 @@ import (
 
 type Article struct {
 	Title   string
-	Slug string
+	Slug    string
 	Content string
 }
-
 
 func (a Article) Validate() error {
 	if a.Title == "" {
