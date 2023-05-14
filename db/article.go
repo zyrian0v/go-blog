@@ -8,11 +8,15 @@ import (
 type Timestamp time.Time
 
 func (ts *Timestamp) Scan(v any) error {
-	b, ok := v.([]byte)
-	if !ok {
-		return errors.New("couldn't assert to bytes")
+	var s string
+	switch u := v.(type) {
+	case string:
+		s = u
+	case []byte:
+		s = string(u)
+	default:
+		return errors.New("unsupported type")
 	}
-	s := string(b)
 
 	t, err := time.Parse(time.DateTime, s)
 	if err != nil {
