@@ -32,7 +32,8 @@ func ApplySchema() {
 }
 
 func GetAllArticles() (as []Article, err error) {
-	stmt := "SELECT title, slug, content FROM articles ORDER BY created_at DESC"
+	stmt := `SELECT title, slug, content, created_at 
+	FROM articles ORDER BY created_at DESC`
 	rows, err := handle.Query(stmt)
 	if err != nil {
 		return
@@ -41,7 +42,10 @@ func GetAllArticles() (as []Article, err error) {
 
 	for rows.Next() {
 		a := Article{}
-		rows.Scan(&a.Title, &a.Slug, &a.Content)
+		err = rows.Scan(&a.Title, &a.Slug, &a.Content, &a.CreatedAt)
+		if err != nil {
+			return
+		}
 		as = append(as, a)
 	}
 	err = rows.Err()
@@ -50,13 +54,15 @@ func GetAllArticles() (as []Article, err error) {
 }
 
 func GetArticleBySlug(slug string) (a Article, err error) {
-	stmt := "SELECT title, slug, content FROM articles WHERE slug = ?"
-	err = handle.QueryRow(stmt, slug).Scan(&a.Title, &a.Slug, &a.Content)
+	stmt := `SELECT title, slug, content, created_at
+	FROM articles WHERE slug = ?`
+	err = handle.QueryRow(stmt, slug).Scan(&a.Title, &a.Slug, &a.Content, &a.CreatedAt)
 	return
 }
 
 func AddArticle(a Article) (err error) {
-	stmt := `INSERT INTO articles (title, slug, content, created_at) VALUES (?, ?, ?, datetime('now', 'localtime'))`
+	stmt := `INSERT INTO articles (title, slug, content, created_at) 
+	VALUES (?, ?, ?, datetime('now', 'localtime'))`
 	_, err = handle.Exec(stmt, a.Title, a.Slug, a.Content)
 	return
 }

@@ -6,6 +6,9 @@
                     {{.Title}}
                 </a>
             </h4>
+
+            <small>{{.CreatedAt.Pretty}}</small>
+            
             {{$l := len .Content}}
             <div>
                 {{printf "%.300s" .Content}}

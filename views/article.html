@@ -1,5 +1,6 @@
 {{define "body"}}
     <h1>{{.Title}}</h1>
+    <small>{{.CreatedAt.Pretty}}</small>
     <p class="article-content">{{.Content}}</p>
 
     <a href="/articles/edit/{{.Slug}}">Edit</a>
