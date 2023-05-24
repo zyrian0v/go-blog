@@ -72,6 +72,7 @@ type NewArticleView struct{}
 func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		v.post(w, r)
+		return
 	}
 
 	log.Println("new article")
@@ -101,8 +102,8 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
-	return
 }
 
 type EditArticleView struct {
