@@ -60,20 +60,36 @@ func GetArticleBySlug(slug string) (a Article, err error) {
 	return
 }
 
-func AddArticle(a Article) (err error) {
+func AddArticle(a Article) (errs []error) {
+	errs = a.Validate()
+	if errs != nil {
+		return
+	}
+
 	stmt := `INSERT INTO articles (title, slug, content, created_at) 
 	VALUES (?, ?, ?, datetime('now', 'localtime'))`
-	_, err = handle.Exec(stmt, a.Title, a.Slug, a.Content)
+	_, err := handle.Exec(stmt, a.Title, a.Slug, a.Content)
+	if err != nil {
+		errs = append(errs, err)
+	}
 	return
 }
 
-func EditArticle(slug string, a Article) (err error) {
+func EditArticle(slug string, a Article) (errs []error) {
+	errs = a.Validate()
+	if errs != nil {
+		return
+	}
+
 	stmt := `UPDATE articles
 	SET title = ?,
 	slug = ?,
 	content = ?
 	WHERE slug = ?`
-	_, err = handle.Exec(stmt, a.Title, a.Slug, a.Content, slug)
+	_, err := handle.Exec(stmt, a.Title, a.Slug, a.Content, slug)
+	if err != nil {
+		errs = append(errs, err)
+	}
 	return
 }
 

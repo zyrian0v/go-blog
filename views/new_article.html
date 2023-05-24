@@ -1,5 +1,11 @@
 {{define "body"}}
     <h1>Add new article</h1>
+
+    <ul class="errors">
+        {{range .Errors}}
+            <li>{{.}}</li>
+        {{end}}
+    </ul>
     
     <form method="post">
         <p>

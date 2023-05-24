@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	slugify "github.com/gosimple/slug"
 	"go-blog/db"
 	"html/template"
@@ -67,7 +66,9 @@ func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type NewArticleView struct{}
+type NewArticleView struct {
+	Errors []error
+}
 
 func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
@@ -93,17 +94,22 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 		Slug:    slugify.Make(r.FormValue("title")),
 		Content: r.FormValue("content"),
 	}
-	if err := a.Validate(); err != nil {
-		fmt.Fprint(w, err)
+
+	if errs := db.AddArticle(a); errs != nil {
+		v.Errors = errs
+	} else {
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 		return
 	}
 
-	if err := db.AddArticle(a); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+	files := []string{
+		"views/layout.html",
+		"views/new_article.html",
 	}
-	
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	tmpl := template.Must(template.ParseFiles(files...))
+	if err := tmpl.Execute(w, v); err != nil {
+		log.Println(err)
+	}
 }
 
 type EditArticleView struct {
@@ -147,15 +153,10 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 		Content: r.FormValue("content"),
 	}
 	v.Article = a
-	if errs := a.Validate(); errs != nil {
-		v.Errors = append(v.Errors, errs...)
-	}
 
-	if err := db.EditArticle(slug, a); err != nil {
-		v.Errors = append(v.Errors, err)
-	}
-
-	if len(v.Errors) == 0 {
+	if errs := db.EditArticle(slug, a); errs != nil {
+		v.Errors = errs
+	} else {
 		http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
 		return
 	}
