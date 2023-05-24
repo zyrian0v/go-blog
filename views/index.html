@@ -7,7 +7,7 @@
                 </a>
             </h4>
 
-            <small>{{.CreatedAt.Pretty}}</small>
+            <small>{{.CreatedAt.Format "02.01.2006"}}</small>
             
             {{$l := len .Content}}
             <div>
