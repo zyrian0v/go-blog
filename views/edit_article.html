@@ -1,6 +1,12 @@
 {{define "body"}}
     <h1>Editing article "{{.Title}}"</h1>
 
+    <ul class="errors">
+        {{range .Errors}}
+            <li>{{.}}</li>
+        {{end}}
+    </ul>
+
     <form method="post">
         <p>
             <label for="title">Title</label>

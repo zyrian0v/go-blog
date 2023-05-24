@@ -1,3 +1,7 @@
 .article-content {
     white-space: pre-wrap;
 }
+
+.errors {
+    color: red;
+}
