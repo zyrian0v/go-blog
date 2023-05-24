@@ -1,4 +1,4 @@
-module blog-try
+module go-blog
 
 go 1.20
 
