@@ -60,27 +60,29 @@ func GetArticleBySlug(slug string) (a Article, err error) {
 	return
 }
 
-func AddArticle(a Article) (errs []error) {
-	errs = a.Validate()
-	if errs != nil {
-		return
+func AddArticle(a Article) ErrorMap {
+	errs := a.Validate()
+	if len(errs) != 0 {
+		return errs
 	}
 
+	errs = make(ErrorMap)
 	stmt := `INSERT INTO articles (title, slug, content, created_at) 
 	VALUES (?, ?, ?, datetime('now', 'localtime'))`
 	_, err := handle.Exec(stmt, a.Title, a.Slug, a.Content)
 	if err != nil {
-		errs = append(errs, err)
+		errs["db"] = append(errs["db"], err)
 	}
-	return
+	return errs
 }
 
-func EditArticle(slug string, a Article) (errs []error) {
-	errs = a.Validate()
-	if errs != nil {
-		return
+func EditArticle(slug string, a Article) ErrorMap {	
+	errs := a.Validate()
+	if len(errs) != 0 {
+		return errs
 	}
 
+	errs = make(ErrorMap)
 	stmt := `UPDATE articles
 	SET title = ?,
 	slug = ?,
@@ -88,9 +90,9 @@ func EditArticle(slug string, a Article) (errs []error) {
 	WHERE slug = ?`
 	_, err := handle.Exec(stmt, a.Title, a.Slug, a.Content, slug)
 	if err != nil {
-		errs = append(errs, err)
+		errs["db"] = append(errs["db"], err)
 	}
-	return
+	return errs
 }
 
 func DeleteArticle(slug string) (err error) {

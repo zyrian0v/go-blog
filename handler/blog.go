@@ -67,7 +67,7 @@ func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewArticleView struct {
-	Errors []error
+	Errors db.ErrorMap
 }
 
 func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +95,7 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 		Content: r.FormValue("content"),
 	}
 
-	if errs := db.AddArticle(a); errs != nil {
+	if errs := db.AddArticle(a); len(errs) != 0 {
 		v.Errors = errs
 	} else {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
@@ -113,7 +113,7 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 }
 
 type EditArticleView struct {
-	Errors []error
+	Errors db.ErrorMap
 	db.Article
 }
 
@@ -154,7 +154,7 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 	}
 	v.Article = a
 
-	if errs := db.EditArticle(slug, a); errs != nil {
+	if errs := db.EditArticle(slug, a); len(errs) != 0 {
 		v.Errors = errs
 	} else {
 		http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)

@@ -2,15 +2,23 @@
     <h1>Add new article</h1>
 
     <ul class="errors">
-        {{range .Errors}}
+        {{range .Errors.db}}
             <li>{{.}}</li>
         {{end}}
     </ul>
     
     <form method="post">
+
+        {{$titleClass := ""}}
+        {{if .Errors.title}}
+            {{$titleClass = "input-error"}}
+        {{end}}
         <p>
             <label for="title">Title</label>
-            <input type="text" name="title" id="title">
+            <input class="{{$titleClass}}" type="text" name="title" id="title">
+            {{range .Errors.title}}
+                <br><small class="error">{{.}}</small>
+            {{end}}
         </p>
 
         <p>

@@ -12,15 +12,19 @@ type Article struct {
 	CreatedAt time.Time
 }
 
-func (a Article) Validate() (errs []error) {
+type ErrorMap map[string][]error
+
+func (a Article) Validate() ErrorMap {
+	errs := make(ErrorMap)
+
 	if a.Title == "" {
 		err := errors.New("title cant be empty")
-		errs = append(errs, err)
+		errs["title"] = append(errs["title"], err)
 	}
 	if a.Slug == "" {
 		err := errors.New("slug cant be empty")
-		errs = append(errs, err)
+		errs["slug"] = append(errs["slug"], err)
 	}
 
-	return
+	return errs
 }
