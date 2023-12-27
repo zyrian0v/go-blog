@@ -31,10 +31,15 @@ func ApplySchema() {
 	}
 }
 
-func GetAllArticles() (as []Article, err error) {
+func GetAllArticles(page int) (as []Article, err error) {
+	paginateBy := 2
+	offset := paginateBy * (page - 1)
 	stmt := `SELECT title, slug, content, created_at 
-	FROM articles ORDER BY created_at DESC`
-	rows, err := handle.Query(stmt)
+	FROM articles 
+	ORDER BY created_at DESC
+	LIMIT ?
+	OFFSET ?`
+	rows, err := handle.Query(stmt, paginateBy, offset)
 	if err != nil {
 		return
 	}
@@ -76,7 +81,7 @@ func AddArticle(a Article) ErrorMap {
 	return errs
 }
 
-func EditArticle(slug string, a Article) ErrorMap {	
+func EditArticle(slug string, a Article) ErrorMap {
 	errs := a.Validate()
 	if len(errs) != 0 {
 		return errs

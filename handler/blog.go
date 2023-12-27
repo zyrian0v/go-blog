@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 type IndexView struct {
@@ -22,7 +23,18 @@ func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	articles, err := db.GetAllArticles()
+	page := 1
+	pageQuery := r.FormValue("page")
+	if pageQuery != "" {
+		var err error
+		page, err = strconv.Atoi(pageQuery)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	}
+	
+	articles, err := db.GetAllArticles(page)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
