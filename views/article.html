@@ -1,5 +1,9 @@
+{{define "title"}}
+Pavel's blog — {{.Title}}
+{{end}}
+
 {{define "body"}}
-    <h1>{{.Title}}</h1>
+    <h2>{{.Title}}</h2>
     <small>{{.CreatedAt.Format "02.01.2006"}}</small>
     <p class="article-content">{{.Content}}</p>
 

@@ -1,11 +1,13 @@
 {{define "body"}}
-    <p>{{.Intro}}</p>
-        {{range .Articles}}
-            <h4>
+    <h2>Latest posts</h2>
+    
+    {{range .Articles}}
+        <p>
+            <div>
                 <a href="/articles/view/{{.Slug}}">
                     {{.Title}}
                 </a>
-            </h4>
+            </div>
 
             <small>{{.CreatedAt.Format "02.01.2006"}}</small>
             
@@ -14,5 +16,6 @@
                 {{printf "%.300s" .Content}}
                 {{- if gt $l 300}}...{{end}} 
             </div>
-        {{end}}
+        </p>
+    {{end}}
 {{end}}
