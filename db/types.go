@@ -15,13 +15,11 @@ type Article struct {
 type ErrorMap map[string][]error
 
 func (a Article) Validate() ErrorMap {
-	var errs []error
+	errs := make(ErrorMap)
 
 	if a.Title == "" {
 		err := errors.New("title cant be empty")
 		errs["title"] = append(errs["title"], err)
-
-		errs = append(errs, err)
 	}
 	if a.Slug == "" {
 		err := errors.New("slug cant be empty")
