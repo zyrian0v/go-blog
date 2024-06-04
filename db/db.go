@@ -32,7 +32,7 @@ func ApplySchema() {
 }
 
 func GetAllArticles(page int) (as []Article, err error) {
-	paginateBy := 2
+	paginateBy := 5
 	offset := paginateBy * (page - 1)
 	stmt := `SELECT title, slug, content, created_at 
 	FROM articles 

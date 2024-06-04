@@ -4,7 +4,9 @@ Pavel's blog — {{.Title}}
 
 {{define "body"}}
     <h2>{{.Title}}</h2>
-    <small>{{.CreatedAt.Format "02.01.2006"}}</small>
+    <div>
+        <small>{{.CreatedAt.Format "02.01.2006"}}</small>
+    </div>
     <p class="article-content">{{.Content}}</p>
 
     <a href="/articles/edit/{{.Slug}}">Edit</a>
