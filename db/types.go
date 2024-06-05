@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"time"
 )
 
@@ -12,18 +11,16 @@ type Article struct {
 	CreatedAt time.Time
 }
 
-type ErrorMap map[string][]error
+type ErrorMap map[string]string
 
 func (a Article) Validate() ErrorMap {
 	errs := make(ErrorMap)
 
 	if a.Title == "" {
-		err := errors.New("title cant be empty")
-		errs["title"] = append(errs["title"], err)
+		errs["title"] = "title cant be empty"
 	}
 	if a.Slug == "" {
-		err := errors.New("slug cant be empty")
-		errs["slug"] = append(errs["slug"], err)
+		errs["slug"] = "slug cant be empty"
 	}
 
 	return errs

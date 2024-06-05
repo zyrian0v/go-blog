@@ -5,11 +5,11 @@ Pavel's blog — New article
 {{define "body"}}
     <h1>Add new article</h1>
 
-    <ul class="errors">
-        {{range .Errors.db}}
-            <li>{{.}}</li>
-        {{end}}
-    </ul>
+    {{if .Errors.db}}
+        <ul class="errors">
+            <li>{{.Errors.db}}</li>
+        </ul>
+    {{end}}
     
     <form method="post">
 
@@ -20,8 +20,8 @@ Pavel's blog — New article
         <p>
             <label for="title">Title</label>
             <input class="{{$titleClass}}" type="text" name="title" id="title">
-            {{range .Errors.title}}
-                <br><small class="error">{{.}}</small>
+            {{if .Errors.title}}
+                <br><small class="error">{{.Errors.title}}</small>
             {{end}}
         </p>
 
