@@ -17,7 +17,7 @@ func main() {
 	fileServer := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
-	root := handler.IndexView{Intro: "Welcome to my blog!"}
+	root := handler.IndexView{}
 	http.Handle("/", root)
 
 	http.Handle("/login/", handler.LoginView{})
