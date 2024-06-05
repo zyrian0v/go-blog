@@ -20,7 +20,7 @@ type IndexView struct {
 }
 
 func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("root page")
+	log.Println(r.URL.Path)
 
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -62,7 +62,7 @@ type ShowArticleView struct {
 
 func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
-	log.Printf("show '%v'", slug)
+	log.Println(r.URL.Path)
 
 	a, err := db.GetArticleBySlug(slug)
 	if err != nil {
@@ -87,12 +87,12 @@ type NewArticleView struct {
 }
 
 func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
+
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
 	}
-
-	log.Println("new article")
 
 	files := []string{
 		"views/layout.html",
@@ -140,14 +140,14 @@ type EditArticleView struct {
 }
 
 func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
+
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
 	}
 
 	slug := r.PathValue("slug")
-
-	log.Printf("edit '%v'", slug)
 
 	a, err := db.GetArticleBySlug(slug)
 	if err != nil {
@@ -201,6 +201,8 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteArticleHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
+
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
