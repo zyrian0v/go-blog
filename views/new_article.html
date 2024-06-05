@@ -5,23 +5,23 @@ Pavel's blog — New article
 {{define "body"}}
     <h1>Add new article</h1>
 
-    {{if .Errors.db}}
+    {{if .DBErr}}
         <ul class="errors">
-            <li>{{.Errors.db}}</li>
+            <li>{{.DBErr}}</li>
         </ul>
     {{end}}
     
     <form method="post">
 
         {{$titleClass := ""}}
-        {{if .Errors.title}}
+        {{if .ValidationErrs.title}}
             {{$titleClass = "input-error"}}
         {{end}}
         <p>
             <label for="title">Title</label>
             <input class="{{$titleClass}}" type="text" name="title" id="title">
-            {{if .Errors.title}}
-                <br><small class="error">{{.Errors.title}}</small>
+            {{if .ValidationErrs.title}}
+                <br><small class="error">{{.ValidationErrs.title}}</small>
             {{end}}
         </p>
 

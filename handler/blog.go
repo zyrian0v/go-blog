@@ -6,9 +6,14 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
 	"strconv"
+	"strings"
 )
+
+type FormErrors struct {
+	ValidationErrs db.ErrorMap
+	DBErr          error
+}
 
 type IndexView struct {
 	Articles []db.Article
@@ -33,7 +38,7 @@ func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	
+
 	articles, err := db.GetAllArticles(page)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -79,7 +84,7 @@ func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewArticleView struct {
-	Errors db.ErrorMap
+	FormErrors
 }
 
 func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -107,11 +112,17 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 		Content: r.FormValue("content"),
 	}
 
-	if errs := db.AddArticle(a); len(errs) != 0 {
-		v.Errors = errs
+	errMap := a.Validate()
+	if len(errMap) > 0 {
+		v.ValidationErrs = errMap
 	} else {
-		http.Redirect(w, r, "/", http.StatusMovedPermanently)
-		return
+		err := db.AddArticle(a)
+		if err != nil {
+			v.DBErr = err
+		} else {
+			http.Redirect(w, r, "/", http.StatusMovedPermanently)
+			return
+		}
 	}
 
 	files := []string{
@@ -125,7 +136,7 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 }
 
 type EditArticleView struct {
-	Errors db.ErrorMap
+	FormErrors
 	db.Article
 }
 
@@ -158,6 +169,7 @@ func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 	slug := strings.TrimSuffix(r.URL.Path, "/")
+	_ = slug
 
 	a := db.Article{
 		Title:   r.FormValue("title"),
@@ -166,11 +178,17 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 	}
 	v.Article = a
 
-	if errs := db.EditArticle(slug, a); len(errs) != 0 {
-		v.Errors = errs
+	errMap := a.Validate()
+	if len(errMap) > 0 {
+		v.ValidationErrs = errMap
 	} else {
-		http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
-		return
+		err := db.EditArticle(slug, a)
+		if err != nil {
+			v.DBErr = err
+		} else {
+			http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
+			return
+		}
 	}
 
 	files := []string{

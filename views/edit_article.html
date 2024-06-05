@@ -6,36 +6,36 @@ Pavel's blog — Edit {{.Title}}
 {{define "body"}}
     <h1>Editing article</h1>
 
-    {{if .Errors.db}}
+    {{if .DBErr}}
         <ul class="errors">
-            <li>{{.Errors.db}}</li>
+            <li>{{.DBErr}}</li>
         </ul>
     {{end}}
 
     <form method="post">
 
         {{$titleClass := ""}}
-        {{if .Errors.title}}
+        {{if .ValidationErrs.title}}
             {{$titleClass = "input-error"}}
         {{end}}
         <p>
             <label for="title">Title</label>
             <input class= "{{$titleClass}}" value="{{.Title}}" type="text" name="title" id="title">
-            {{if .Errors.title}}
-                <br><small class="error">{{.Errors.title}}</small>
+            {{if .ValidationErrs.title}}
+                <br><small class="error">{{.ValidationErrs.title}}</small>
             {{end}}
         </p>
 
 
         {{$slugClass := ""}}
-        {{if .Errors.slug}}
+        {{if .ValidationErrs.slug}}
             {{$slugClass = "input-error"}}
         {{end}}
         <p>
             <label for="slug">Slug</label>
             <input class="{{$slugClass}}" value="{{.Slug}}" type="text" name="slug" id="slug">
-            {{if .Errors.slug}}
-                <br><small class="error">{{.Errors.slug}}</small>
+            {{if .ValidationErrs.slug}}
+                <br><small class="error">{{.ValidationErrs.slug}}</small>
             {{end}}
         </p>
 
