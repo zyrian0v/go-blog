@@ -21,21 +21,9 @@ func main() {
 	http.Handle("/", root)
 
 	http.Handle("/login/", handler.LoginView{})
-
-	// const articleRoute = "/articles/view/"
-	// showArticle := http.StripPrefix(articleRoute, handler.ShowArticleView{})
 	http.Handle("/articles/view/{slug}", handler.ShowArticleView{})
-
-	// const newArticleRoute = "/articles/new/"
-	// newArticle := http.StripPrefix(newArticleRoute, handler.NewArticleView{})
 	http.Handle("/articles/new/", handler.NewArticleView{})
-
-	// const editArticleRoute = "/articles/edit/"
-	// editArticle := http.StripPrefix(editArticleRoute, handler.EditArticleView{})
 	http.Handle("/articles/edit/{slug}", handler.EditArticleView{})
-
-	// const deleteArticleRoute = "/articles/delete/"
-	// deleteArticle := http.StripPrefix(deleteArticleRoute, http.HandlerFunc(handler.DeleteArticleHandler))
 	http.Handle("/articles/delete/{slug}", http.HandlerFunc(handler.DeleteArticleHandler))
 
 	log.Println("serving on :8080")

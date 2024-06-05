@@ -83,6 +83,7 @@ func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewArticleView struct {
+	db.Article
 	FormErrors
 }
 
@@ -110,6 +111,7 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 		Slug:    slugify.Make(r.FormValue("title")),
 		Content: r.FormValue("content"),
 	}
+	v.Article = a
 
 	errMap := a.Validate()
 	if len(errMap) > 0 {
@@ -135,8 +137,8 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 }
 
 type EditArticleView struct {
-	FormErrors
 	db.Article
+	FormErrors
 }
 
 func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
