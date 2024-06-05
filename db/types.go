@@ -17,10 +17,10 @@ func (a Article) Validate() ErrorMap {
 	errs := make(ErrorMap)
 
 	if a.Title == "" {
-		errs["title"] = "title cant be empty"
+		errs["title"] = "Title cant be empty"
 	}
 	if a.Slug == "" {
-		errs["slug"] = "slug cant be empty"
+		errs["slug"] = "Slug cant be empty"
 	}
 
 	return errs

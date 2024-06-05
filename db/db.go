@@ -2,9 +2,10 @@ package db
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
+	"errors"
+	sqlite "github.com/mattn/go-sqlite3"
 )
 
 var handle *sql.DB
@@ -66,12 +67,11 @@ func GetArticleBySlug(slug string) (a Article, err error) {
 }
 
 func AddArticle(a Article) error {
-
 	stmt := `INSERT INTO articles (title, slug, content, created_at) 
 	VALUES (?, ?, ?, datetime('now', 'localtime'))`
 	_, err := handle.Exec(stmt, a.Title, a.Slug, a.Content)
 	if err != nil {
-		return err
+		return simplifyErr(err)
 	}
 	return nil
 }
@@ -84,7 +84,7 @@ func EditArticle(slug string, a Article) error {
 	WHERE slug = ?`
 	_, err := handle.Exec(stmt, a.Title, a.Slug, a.Content, slug)
 	if err != nil {
-		return err
+		return simplifyErr(err)
 	}
 	return nil
 }
@@ -93,4 +93,14 @@ func DeleteArticle(slug string) (err error) {
 	stmt := "DELETE FROM articles WHERE slug = ?"
 	_, err = handle.Exec(stmt, slug)
 	return
+}
+
+func simplifyErr(err error) error {
+	var sqlErr sqlite.Error
+	if errors.As(err, &sqlErr) {
+		if sqlErr.Code == sqlite.ErrConstraint {
+			err = errors.New("Slug already exists")
+		}
+	}
+	return err
 }

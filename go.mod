@@ -1,4 +1,4 @@
-module go-blog
+module blog
 
 go 1.22
 

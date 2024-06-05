@@ -2,7 +2,7 @@ package handler
 
 import (
 	slugify "github.com/gosimple/slug"
-	"go-blog/db"
+	"blog/db"
 	"html/template"
 	"log"
 	"net/http"
@@ -125,7 +125,7 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 		return
-	} 
+	}
 
 	err := db.AddArticle(a)
 	if err != nil {
@@ -146,7 +146,7 @@ type EditArticleView struct {
 
 func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
-	
+
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
@@ -194,7 +194,7 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 		return
-	} 
+	}
 
 	err := db.EditArticle(slug, a)
 	if err != nil {

@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"go-blog/db"
-	"go-blog/handler"
+	"blog/db"
+	"blog/handler"
 )
 
 func main() {
