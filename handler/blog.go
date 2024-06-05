@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type FormErrors struct {
@@ -62,7 +61,7 @@ type ShowArticleView struct {
 }
 
 func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	slug := strings.TrimSuffix(r.URL.Path, "/")
+	slug := r.PathValue("slug")
 	log.Printf("show '%v'", slug)
 
 	a, err := db.GetArticleBySlug(slug)
@@ -146,7 +145,8 @@ func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slug := strings.TrimSuffix(r.URL.Path, "/")
+	slug := r.PathValue("slug")
+
 	log.Printf("edit '%v'", slug)
 
 	a, err := db.GetArticleBySlug(slug)
@@ -168,8 +168,7 @@ func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
-	slug := strings.TrimSuffix(r.URL.Path, "/")
-	_ = slug
+	slug := r.PathValue("slug")
 
 	a := db.Article{
 		Title:   r.FormValue("title"),
@@ -207,7 +206,8 @@ func DeleteArticleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slug := strings.TrimSuffix(r.URL.Path, "/")
+	slug := r.PathValue("slug")
+
 	log.Printf("delete '%v'", slug)
 
 	if err := db.DeleteArticle(slug); err != nil {
