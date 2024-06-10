@@ -11,10 +11,8 @@ type Article struct {
 	CreatedAt time.Time
 }
 
-type ErrorMap map[string]string
-
-func (a Article) Validate() ErrorMap {
-	errs := make(ErrorMap)
+func (a Article) Validate() map[string]string {
+	errs := make(map[string]string)
 
 	if a.Title == "" {
 		errs["title"] = "Title cant be empty"

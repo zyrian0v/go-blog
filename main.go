@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"blog/db"
-	"blog/handler"
+	"blog/views"
 )
 
 func main() {
@@ -17,14 +17,14 @@ func main() {
 	fileServer := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
-	root := handler.IndexView{}
+	root := views.Index{}
 	http.Handle("/", root)
 
-	http.Handle("/login/", handler.LoginView{})
-	http.Handle("/articles/view/{slug}", handler.ShowArticleView{})
-	http.Handle("/articles/new/", handler.NewArticleView{})
-	http.Handle("/articles/edit/{slug}", handler.EditArticleView{})
-	http.Handle("/articles/delete/{slug}", http.HandlerFunc(handler.DeleteArticleHandler))
+	http.Handle("/login/", views.Login{})
+	http.Handle("/articles/view/{slug}", views.ShowArticle{})
+	http.Handle("/articles/new/", views.NewArticle{})
+	http.Handle("/articles/edit/{slug}", views.EditArticle{})
+	http.Handle("/articles/delete/{slug}", http.HandlerFunc(views.DeleteArticle))
 
 	log.Println("serving on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

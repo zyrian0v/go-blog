@@ -1,8 +1,8 @@
-package handler
+package views
 
 import (
-	slugify "github.com/gosimple/slug"
 	"blog/db"
+	slugify "github.com/gosimple/slug"
 	"html/template"
 	"log"
 	"net/http"
@@ -10,15 +10,15 @@ import (
 )
 
 type FormErrors struct {
-	ValidationErrs db.ErrorMap
+	ValidationErrs map[string]string
 	DBErr          error
 }
 
-type IndexView struct {
+type Index struct {
 	Articles []db.Article
 }
 
-func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 
 	if r.URL.Path != "/" {
@@ -45,8 +45,8 @@ func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Articles = articles
 
 	files := []string{
-		"views/layout.html",
-		"views/index.html",
+		"templates/layout.html",
+		"templates/index.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 	if err := tmpl.Execute(w, v); err != nil {
@@ -55,11 +55,11 @@ func (v IndexView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type ShowArticleView struct {
+type ShowArticle struct {
 	db.Article
 }
 
-func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 	log.Println(r.URL.Path)
 
@@ -72,8 +72,8 @@ func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"views/layout.html",
-		"views/article.html",
+		"templates/layout.html",
+		"templates/article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 	if err := tmpl.Execute(w, v); err != nil {
@@ -81,12 +81,12 @@ func (v ShowArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type NewArticleView struct {
+type NewArticle struct {
 	db.Article
 	FormErrors
 }
 
-func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 
 	if r.Method == "POST" {
@@ -95,8 +95,8 @@ func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := []string{
-		"views/layout.html",
-		"views/new_article.html",
+		"templates/layout.html",
+		"templates/new_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 	if err := tmpl.Execute(w, v); err != nil {
@@ -104,7 +104,7 @@ func (v NewArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
+func (v NewArticle) post(w http.ResponseWriter, r *http.Request) {
 	a := db.Article{
 		Title:   r.FormValue("title"),
 		Slug:    slugify.Make(r.FormValue("title")),
@@ -113,8 +113,8 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"views/layout.html",
-		"views/new_article.html",
+		"templates/layout.html",
+		"templates/new_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 
@@ -139,12 +139,12 @@ func (v NewArticleView) post(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
-type EditArticleView struct {
+type EditArticle struct {
 	db.Article
 	FormErrors
 }
 
-func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 
 	if r.Method == "POST" {
@@ -162,8 +162,8 @@ func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"views/layout.html",
-		"views/edit_article.html",
+		"templates/layout.html",
+		"templates/edit_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 	if err := tmpl.Execute(w, v); err != nil {
@@ -171,7 +171,7 @@ func (v EditArticleView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
+func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 
 	a := db.Article{
@@ -182,8 +182,8 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"views/layout.html",
-		"views/edit_article.html",
+		"templates/layout.html",
+		"templates/edit_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 
@@ -208,7 +208,7 @@ func (v EditArticleView) post(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
 }
 
-func DeleteArticleHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 
 	if r.Method != "POST" {

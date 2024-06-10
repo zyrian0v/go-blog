@@ -2,10 +2,10 @@ package db
 
 import (
 	"database/sql"
-	"log"
-	"os"
 	"errors"
 	sqlite "github.com/mattn/go-sqlite3"
+	"log"
+	"os"
 )
 
 var handle *sql.DB

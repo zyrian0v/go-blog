@@ -1,4 +1,4 @@
-package handler
+package views
 
 import (
 	"fmt"
@@ -7,14 +7,14 @@ import (
 	"net/http"
 )
 
-type LoginView struct{}
+type Login struct{}
 
 var (
 	username = "admin"
 	password = "admin"
 )
 
-func (v LoginView) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("login page")
 
 	if r.Method == "POST" {
