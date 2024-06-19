@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
@@ -9,9 +10,14 @@ import (
 )
 
 func main() {
+	schemaFlag := flag.Bool("schema", false, "apply schema")
+	flag.Parse()
+	
 	// Database
 	db.InitializeHandle()
-	db.ApplySchema()
+	if *schemaFlag {
+		db.ApplySchema()
+	}
 
 	// Routes
 	fileServer := http.FileServer(http.Dir("static"))
