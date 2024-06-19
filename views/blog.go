@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"math"
 )
 
 type FormErrors struct {
@@ -47,8 +46,11 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	paginateBy := 5
-	pageCount := math.Ceil(float64(count) / float64(paginateBy))
-	v.PageCount = int(pageCount)
+	pageCount := count / paginateBy
+	if count % paginateBy != 0 {
+		pageCount += 1
+	}
+	v.PageCount = pageCount
 
 	articles, err := db.GetArticlePage(page, paginateBy)
 	if err != nil {
