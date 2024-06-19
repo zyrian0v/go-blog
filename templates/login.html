@@ -5,6 +5,15 @@ Pavel's blog — Log in
 
 {{define "body"}}
     <h1>Log in</h1>
+
+    {{if .Err}}
+        <p>
+            <ul class="errors">
+                <li>{{.Err}}</li>
+            </ul>
+        </p>
+    {{end}}
+    
     <form method="post">
         <label for="username">Username</label>
         <input type="text" name="username" id="username">

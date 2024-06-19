@@ -5,9 +5,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"errors"
 )
 
-type Login struct{}
+type Login struct{
+	Err error
+}
 
 var (
 	username = "admin"
@@ -15,7 +18,12 @@ var (
 )
 
 func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("login page")
+	log.Println(r.URL.Path)
+
+	files := []string{
+		"templates/layout.html",
+		"templates/login.html",
+	}
 
 	if r.Method == "POST" {
 		user := r.FormValue("username")
@@ -23,16 +31,12 @@ func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if user == username && pass == password {
 			fmt.Fprint(w, "youre logged in")
+			return
 		} else {
-			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+			v.Err = errors.New("Wrong username or password")
 		}
-		return
 	}
 
-	files := []string{
-		"templates/layout.html",
-		"templates/login.html",
-	}
 	tmpl := template.Must(template.ParseFiles(files...))
 	if err := tmpl.Execute(w, v); err != nil {
 		log.Println(err)
