@@ -32,8 +32,7 @@ func ApplySchema() {
 	}
 }
 
-func GetArticlePage(page int) (as []Article, err error) {
-	paginateBy := 5
+func GetArticlePage(page, paginateBy int) (as []Article, err error) {
 	offset := paginateBy * (page - 1)
 	stmt := `SELECT title, slug, content, created_at 
 	FROM articles 
@@ -56,6 +55,12 @@ func GetArticlePage(page int) (as []Article, err error) {
 	}
 	err = rows.Err()
 
+	return
+}
+
+func GetArticleCount() (count int, err error) {
+	stmt := "SELECT COUNT(*) FROM articles"
+	err = handle.QueryRow(stmt).Scan(&count)
 	return
 }
 

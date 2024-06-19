@@ -15,8 +15,8 @@ type FormErrors struct {
 }
 
 type Index struct {
-	Articles                 []db.Article
-	Page, PrevPage, NextPage int
+	Articles                            []db.Article
+	Page, PrevPage, NextPage, PageCount int
 }
 
 func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -40,8 +40,15 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Page = page
 	v.PrevPage = page - 1
 	v.NextPage = page + 1
+	count, err := db.GetArticleCount()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	paginateBy := 5
+	v.PageCount = count / paginateBy
 
-	articles, err := db.GetArticlePage(page)
+	articles, err := db.GetArticlePage(page, paginateBy)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

@@ -20,13 +20,16 @@
     {{end}}
 
     <p>
-        {{if gt .Page 1}}
-            <a href="/?page={{.PrevPage}}"> < </a>
-        {{end}}
+        <div class="pagination">
+            {{if gt .Page 1}}
+                <a href="/?page={{.PrevPage}}"> < </a>
+            {{end}}
 
-        {{.Page}}
+            {{.Page}}
 
-        <a href="/?page={{.NextPage}}"> > </a>
-
+            {{if le .Page .PageCount}}
+                <a href="/?page={{.NextPage}}"> > </a>
+            {{end}}
+        </div>
     </p>
 {{end}}

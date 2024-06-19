@@ -13,3 +13,13 @@
 .input-error {
     border: 1px solid red;
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.pagination a {
+    padding: 0 0.5rem;
+}

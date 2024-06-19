@@ -12,7 +12,7 @@ import (
 func main() {
 	schemaFlag := flag.Bool("schema", false, "apply schema")
 	flag.Parse()
-	
+
 	// Database
 	db.InitializeHandle()
 	if *schemaFlag {

@@ -44,12 +44,10 @@ Pavel's blog — Edit {{.Title}}
             <textarea name="content" id="content" cols="50" rows="10">{{.Content}}</textarea>
         </p>
 
-        <p>
-            <input type="submit" value="Submit">
-        </p>
+        <input type="submit" value="Submit">
     </form>
 
     <form action="/articles/delete/{{.Slug}}" method="post">
-        <input class="delete-button" type="submit" value="Delete article">
+        <input class="delete-button" type="submit" value="Delete">
     </form>
 {{end}}
