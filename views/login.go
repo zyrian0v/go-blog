@@ -22,7 +22,7 @@ func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		pass := r.FormValue("password")
 
 		if user == username && pass == password {
-			fmt.Fprint(w, "yourre logged in")
+			fmt.Fprint(w, "youre logged in")
 		} else {
 			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 		}
@@ -30,8 +30,8 @@ func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := []string{
-		"views/layout.html",
-		"views/login.html",
+		"templates/layout.html",
+		"templates/login.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
 	if err := tmpl.Execute(w, v); err != nil {
