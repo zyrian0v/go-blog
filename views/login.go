@@ -1,14 +1,14 @@
 package views
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"errors"
 )
 
-type Login struct{
+type Login struct {
 	Err error
 }
 

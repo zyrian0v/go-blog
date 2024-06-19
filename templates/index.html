@@ -18,4 +18,15 @@
             </div>
         </p>
     {{end}}
+
+    <p>
+        {{if gt .Page 1}}
+            <a href="/?page={{.PrevPage}}"> < </a>
+        {{end}}
+
+        {{.Page}}
+        
+        <a href="/?page={{.NextPage}}"> > </a>
+
+    </p>
 {{end}}
