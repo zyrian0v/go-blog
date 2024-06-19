@@ -41,7 +41,7 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.PrevPage = page - 1
 	v.NextPage = page + 1
 
-	articles, err := db.GetAllArticles(page)
+	articles, err := db.GetArticlePage(page)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

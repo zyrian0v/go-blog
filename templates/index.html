@@ -2,7 +2,7 @@
     <h2>Latest posts</h2>
     
     {{range .Articles}}
-        <p>
+        <article>
             <div>
                 <a href="/articles/view/{{.Slug}}">
                     {{.Title}}
@@ -16,7 +16,7 @@
                 {{printf "%.300s" .Content}}
                 {{- if gt $l 300}}...{{end}} 
             </div>
-        </p>
+        </article>
     {{end}}
 
     <p>
@@ -25,7 +25,7 @@
         {{end}}
 
         {{.Page}}
-        
+
         <a href="/?page={{.NextPage}}"> > </a>
 
     </p>
