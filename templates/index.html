@@ -27,7 +27,7 @@
 
             {{.Page}}
 
-            {{if le .Page .PageCount}}
+            {{if lt .Page .PageCount}}
                 <a href="/?page={{.NextPage}}"> > </a>
             {{end}}
         </div>
