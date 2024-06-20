@@ -45,7 +45,7 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	paginateBy := 5
 	pageCount := count / paginateBy
-	if count % paginateBy != 0 {
+	if count%paginateBy != 0 {
 		pageCount += 1
 	}
 	v.PageCount = pageCount
@@ -215,7 +215,7 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
 }
 
-type DeleteArticle struct {}
+type DeleteArticle struct{}
 
 func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {

@@ -1,6 +1,10 @@
 {{define "body"}}
     <h2>Latest posts</h2>
-    
+
+    {{if not .Articles}}
+        <p>Nothing was posted yet.</p>
+    {{end}}
+        
     {{range .Articles}}
         <article>
             <div>
@@ -19,17 +23,19 @@
         </article>
     {{end}}
 
-    <p>
-        <div class="pagination">
-            {{if gt .Page 1}}
-                <a href="/?page={{.PrevPage}}"> < </a>
-            {{end}}
+    {{if gt .PageCount 1}}
+        <p>
+            <div class="pagination">
+                {{if gt .Page 1}}
+                    <a href="/?page={{.PrevPage}}"> < </a>
+                {{end}}
 
-            {{.Page}}
+                {{.Page}}
 
-            {{if lt .Page .PageCount}}
-                <a href="/?page={{.NextPage}}"> > </a>
-            {{end}}
-        </div>
-    </p>
+                {{if lt .Page .PageCount}}
+                    <a href="/?page={{.NextPage}}"> > </a>
+                {{end}}
+            </div>
+        </p>
+    {{end}}
 {{end}}
