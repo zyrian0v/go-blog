@@ -9,6 +9,10 @@ import (
 	"strconv"
 )
 
+const (
+	paginateBy = 5
+)
+
 type FormErrors struct {
 	ValidationErrs map[string]string
 	DBErr          error
@@ -43,7 +47,6 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	paginateBy := 5
 	pageCount := count / paginateBy
 	if count%paginateBy != 0 {
 		pageCount += 1
@@ -58,7 +61,7 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Articles = articles
 
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/index.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
@@ -83,7 +86,7 @@ func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
@@ -104,7 +107,7 @@ func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/new_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
@@ -122,7 +125,7 @@ func (v NewArticle) post(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/new_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
@@ -169,7 +172,7 @@ func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/edit_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
@@ -189,7 +192,7 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 	v.Article = a
 
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/edit_article.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))

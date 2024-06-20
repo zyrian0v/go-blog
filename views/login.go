@@ -19,7 +19,7 @@ var (
 
 func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	files := []string{
-		"templates/layout.html",
+		"templates/base.html",
 		"templates/login.html",
 	}
 
