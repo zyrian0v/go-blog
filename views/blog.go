@@ -215,16 +215,15 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
 }
 
-func DeleteArticle(w http.ResponseWriter, r *http.Request) {
+type DeleteArticle struct {}
+
+func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	slug := r.PathValue("slug")
-
-	log.Printf("delete '%v'", slug)
-
 	if err := db.DeleteArticle(slug); err != nil {
 		http.Error(w, err.Error(), 500)
 		return

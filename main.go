@@ -29,7 +29,7 @@ func main() {
 	http.Handle("/articles/view/{slug}", middleware(views.ShowArticle{}))
 	http.Handle("/articles/new/", middleware(views.NewArticle{}))
 	http.Handle("/articles/edit/{slug}", middleware(views.EditArticle{}))
-	http.Handle("/articles/delete/{slug}", middleware(http.HandlerFunc(views.DeleteArticle)))
+	http.Handle("/articles/delete/{slug}", middleware(views.DeleteArticle{}))
 
 	log.Println("serving on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
