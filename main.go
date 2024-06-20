@@ -23,15 +23,22 @@ func main() {
 	fileServer := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
-	root := views.Index{}
-	http.Handle("/", root)
+	http.Handle("/", middleware(views.Index{}))
 
-	http.Handle("/login/", views.Login{})
-	http.Handle("/articles/view/{slug}", views.ShowArticle{})
-	http.Handle("/articles/new/", views.NewArticle{})
-	http.Handle("/articles/edit/{slug}", views.EditArticle{})
-	http.Handle("/articles/delete/{slug}", http.HandlerFunc(views.DeleteArticle))
+	http.Handle("/login/", middleware(views.Login{}))
+	http.Handle("/articles/view/{slug}", middleware(views.ShowArticle{}))
+	http.Handle("/articles/new/", middleware(views.NewArticle{}))
+	http.Handle("/articles/edit/{slug}", middleware(views.EditArticle{}))
+	http.Handle("/articles/delete/{slug}", middleware(http.HandlerFunc(views.DeleteArticle)))
 
 	log.Println("serving on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func middleware(next http.Handler) http.Handler {
+	f := func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL.Path)
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(f)
 }

@@ -20,8 +20,6 @@ type Index struct {
 }
 
 func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
-
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -76,8 +74,6 @@ type ShowArticle struct {
 
 func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
-	log.Println(r.URL.Path)
-
 	a, err := db.GetArticleBySlug(slug)
 	if err != nil {
 		http.NotFound(w, r)
@@ -102,8 +98,6 @@ type NewArticle struct {
 }
 
 func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
-
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
@@ -160,8 +154,6 @@ type EditArticle struct {
 }
 
 func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
-
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
@@ -224,8 +216,6 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteArticle(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
-
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

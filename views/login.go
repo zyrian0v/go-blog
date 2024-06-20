@@ -18,8 +18,6 @@ var (
 )
 
 func (v Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
-
 	files := []string{
 		"templates/layout.html",
 		"templates/login.html",
