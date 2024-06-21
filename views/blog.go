@@ -2,6 +2,8 @@ package views
 
 import (
 	"blog/db"
+	"context"
+	"github.com/go-session/session/v3"
 	slugify "github.com/gosimple/slug"
 	"html/template"
 	"log"
@@ -101,6 +103,17 @@ type NewArticle struct {
 }
 
 func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	auth, ok := store.Get("auth")
+	if !ok && auth != true {
+		http.Error(w, "Not authenticated", 500)
+		return
+	}
+
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
@@ -157,6 +170,17 @@ type EditArticle struct {
 }
 
 func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	auth, ok := store.Get("auth")
+	if !ok && auth != true {
+		http.Error(w, "Not authenticated", 500)
+		return
+	}
+
 	if r.Method == "POST" {
 		v.post(w, r)
 		return
@@ -221,6 +245,17 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 type DeleteArticle struct{}
 
 func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	auth, ok := store.Get("auth")
+	if !ok && auth != true {
+		http.Error(w, "Not authenticated", 500)
+		return
+	}
+	
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
