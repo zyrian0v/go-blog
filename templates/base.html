@@ -12,9 +12,14 @@
     <header>
         <nav>
             <a href="/">Home</a>
-            <a href="/articles/new">New article</a>
-            <a href="/login">Log in</a>
-            <a href="/logout">Log out</a>
+            {{if .User}}
+                <a href="/articles/new">New article</a>
+            {{end}}
+            {{if .User}}
+                <a href="/logout/">Log out from {{.User}}</a>
+            {{else}}
+                <a href="/login/">Log in</a>
+            {{end}}
         </nav>
         <h1>My blog</h1>
         <p>Hello and welcome to my blog!</p>

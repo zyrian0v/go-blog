@@ -20,7 +20,24 @@ type FormErrors struct {
 	DBErr          error
 }
 
+type Auth struct {
+	User string
+}
+
+func isLoggedIn(w http.ResponseWriter, r *http.Request) (string, error) {
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		return "", err
+	}
+	user, ok := store.Get("user")
+	if !ok {
+		return "", nil
+	}
+	return user.(string), nil
+}
+
 type Index struct {
+	Auth
 	Articles                            []db.Article
 	Page, PrevPage, NextPage, PageCount int
 }
@@ -30,6 +47,13 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+
+	user, err := isLoggedIn(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	v.User = user
 
 	page := 1
 	pageQuery := r.FormValue("page")
@@ -74,10 +98,18 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type ShowArticle struct {
+	Auth
 	db.Article
 }
 
 func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	user, err := isLoggedIn(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	v.User = user
+
 	slug := r.PathValue("slug")
 	a, err := db.GetArticleBySlug(slug)
 	if err != nil {
@@ -98,18 +130,19 @@ func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewArticle struct {
+	Auth
 	db.Article
 	FormErrors
 }
 
 func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	store, err := session.Start(context.Background(), w, r)
+	user, err := isLoggedIn(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	auth, ok := store.Get("auth")
-	if !ok && auth != true {
+	v.User = user
+	if user == "" {
 		http.Error(w, "Not authenticated", 500)
 		return
 	}
@@ -161,22 +194,23 @@ func (v NewArticle) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/", 303)
 }
 
 type EditArticle struct {
+	Auth
 	db.Article
 	FormErrors
 }
 
 func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	store, err := session.Start(context.Background(), w, r)
+	user, err := isLoggedIn(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	auth, ok := store.Get("auth")
-	if !ok && auth != true {
+	v.User = user
+	if user == "" {
 		http.Error(w, "Not authenticated", 500)
 		return
 	}
@@ -239,23 +273,22 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/articles/view/"+a.Slug, http.StatusMovedPermanently)
+	http.Redirect(w, r, "/articles/view/"+a.Slug, 303)
 }
 
 type DeleteArticle struct{}
 
 func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	store, err := session.Start(context.Background(), w, r)
+	user, err := isLoggedIn(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	auth, ok := store.Get("auth")
-	if !ok && auth != true {
+	if user == "" {
 		http.Error(w, "Not authenticated", 500)
 		return
 	}
-	
+
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -266,5 +299,5 @@ func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/", 303)
 }
