@@ -9,5 +9,13 @@ Blog — {{.Title}}
     </div>
     <p class="article-content">{{.Content}}</p>
 
-    <a href="/articles/edit/{{.Slug}}">Edit</a>
+    {{if .User}}
+        <div class="actions">
+            <a class="button" href="/articles/edit/{{.Slug}}">Edit</a>
+
+            <form action="/articles/delete/{{.Slug}}" method="post">
+                <input class="delete-button" type="submit" value="Delete">
+            </form>
+        </div>
+    {{end}}
 {{end}}
