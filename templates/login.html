@@ -4,25 +4,27 @@ Blog — Log in
 
 
 {{define "body"}}
-    <h2>Log in</h2>
+<div class="login">
+    <div>
+        <h2>Log in</h2>
 
-    {{if .Err}}
-        <p>
-            <ul class="errors">
-                <li>{{.Err}}</li>
-            </ul>
-        </p>
-    {{end}}
-    
-    <form method="post">
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username">
+        {{if .Err}}
+            <p>
+                <ul class="errors">
+                    <li>{{.Err}}</li>
+                </ul>
+            </p>
+        {{end}}
+        
+        <form method="post">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username">
 
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
 
-        <p>
-            <input type="submit" value="Login">
-        </p>
-    </form>
+            <input class="login-submit" type="submit" value="Log in">
+        </form>
+    </div>
+</div>
 {{end}}

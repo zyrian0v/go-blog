@@ -31,3 +31,18 @@
 .actions * {
     margin-right: 1rem;
 }
+
+.login {
+    display: flex;
+    justify-content: center;
+}
+
+.login h2 {
+    text-align: center;
+}
+
+.login-submit {
+    display: block;
+    width: 100%;
+}
+
