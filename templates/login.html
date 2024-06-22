@@ -9,10 +9,8 @@ Blog — Log in
         <h2>Log in</h2>
 
         {{if .Err}}
-            <p>
-                <ul class="errors">
-                    <li>{{.Err}}</li>
-                </ul>
+            <p class="errors">
+                {{.Err}}
             </p>
         {{end}}
         
