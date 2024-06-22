@@ -24,7 +24,7 @@ type Auth struct {
 	User string
 }
 
-func isLoggedIn(w http.ResponseWriter, r *http.Request) (string) {
+func isLoggedIn(w http.ResponseWriter, r *http.Request) string {
 	store, err := session.Start(context.Background(), w, r)
 	if err != nil {
 		log.Println(err)

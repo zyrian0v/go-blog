@@ -3,7 +3,7 @@ Blog — New article
 {{end}}
 
 {{define "body"}}
-    <h1>New article</h1>
+    <h2>New article</h2>
 
     {{if .DBErr}}
         <ul class="errors">
@@ -26,8 +26,12 @@ Blog — New article
         </p>
 
         <p>
+            <small>Slug is automatically generated from the title.</small>
+        </p>
+
+        <p>
             <label for="content">Content</label>
-            <textarea name="content" id="content" cols="50" rows="10">{{.Content}}</textarea>
+            <textarea name="content" id="content" cols="80" rows="15">{{.Content}}</textarea>
         </p>
 
         <p>
