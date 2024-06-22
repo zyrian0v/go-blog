@@ -24,16 +24,17 @@ type Auth struct {
 	User string
 }
 
-func isLoggedIn(w http.ResponseWriter, r *http.Request) (string, error) {
+func isLoggedIn(w http.ResponseWriter, r *http.Request) (string) {
 	store, err := session.Start(context.Background(), w, r)
 	if err != nil {
-		return "", err
+		log.Println(err)
+		return ""
 	}
 	user, ok := store.Get("user")
 	if !ok {
-		return "", nil
+		return ""
 	}
-	return user.(string), nil
+	return user.(string)
 }
 
 type Index struct {
@@ -48,11 +49,7 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := isLoggedIn(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	user := isLoggedIn(w, r)
 	v.User = user
 
 	page := 1
@@ -103,11 +100,7 @@ type ShowArticle struct {
 }
 
 func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user, err := isLoggedIn(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	user := isLoggedIn(w, r)
 	v.User = user
 
 	slug := r.PathValue("slug")
@@ -136,11 +129,7 @@ type NewArticle struct {
 }
 
 func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user, err := isLoggedIn(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	user := isLoggedIn(w, r)
 	v.User = user
 	if user == "" {
 		http.Error(w, "Not authenticated", 500)
@@ -204,11 +193,7 @@ type EditArticle struct {
 }
 
 func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user, err := isLoggedIn(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	user := isLoggedIn(w, r)
 	v.User = user
 	if user == "" {
 		http.Error(w, "Not authenticated", 500)
@@ -279,11 +264,7 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 type DeleteArticle struct{}
 
 func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user, err := isLoggedIn(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	user := isLoggedIn(w, r)
 	if user == "" {
 		http.Error(w, "Not authenticated", 500)
 		return

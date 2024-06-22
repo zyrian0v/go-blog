@@ -15,7 +15,7 @@ type LogIn struct {
 	Err error
 }
 
-var (
+const (
 	username = "admin"
 	password = "admin"
 )
@@ -23,7 +23,7 @@ var (
 func (v LogIn) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	store, err := session.Start(context.Background(), w, r)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		log.Println(err)
 		return
 	}
 	user, ok := store.Get("user")
