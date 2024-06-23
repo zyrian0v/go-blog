@@ -12,7 +12,6 @@ import (
 )
 
 type LogIn struct {
-	Auth
 	Err error
 }
 
@@ -26,10 +25,6 @@ func (v LogIn) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
-	}
-	user, ok := store.Get("user")
-	if ok {
-		v.User = user.(string)
 	}
 
 	if r.Method == "POST" {
@@ -70,6 +65,7 @@ func (v LogOut) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	store.Delete("user")
+	store.Set("flash", "Successfully logged out.")
 	err = store.Save()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
