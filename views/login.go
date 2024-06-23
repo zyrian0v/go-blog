@@ -52,7 +52,7 @@ func (v LogIn) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := []string{
-		"templates/base.html",
+		"templates/base_no_header.html",
 		"templates/login.html",
 	}
 	tmpl := template.Must(template.ParseFiles(files...))
