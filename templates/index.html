@@ -1,4 +1,8 @@
 {{define "body"}}
+    {{if .Flash}}
+        <p class="notice">{{.Flash}}</p>
+    {{end}}
+
     {{if not .Articles}}
         <p>Nothing was posted yet.</p>
     {{end}}

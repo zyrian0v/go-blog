@@ -2,6 +2,7 @@ package views
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -23,7 +24,7 @@ const (
 func (v LogIn) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	store, err := session.Start(context.Background(), w, r)
 	if err != nil {
-		log.Println(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 	user, ok := store.Get("user")
@@ -36,6 +37,8 @@ func (v LogIn) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		pass := r.FormValue("password")
 		if user == username && pass == password {
 			store.Set("user", user)
+			flash := fmt.Sprintf("Successfully logged in as %v.", user)
+			store.Set("flash", flash)
 			err := store.Save()
 			if err != nil {
 				http.Error(w, err.Error(), 500)

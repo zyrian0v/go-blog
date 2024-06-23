@@ -3,6 +3,7 @@ package views
 import (
 	"blog/db"
 	"context"
+	"fmt"
 	"github.com/go-session/session/v3"
 	slugify "github.com/gosimple/slug"
 	"html/template"
@@ -24,21 +25,9 @@ type Auth struct {
 	User string
 }
 
-func isLoggedIn(w http.ResponseWriter, r *http.Request) string {
-	store, err := session.Start(context.Background(), w, r)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	user, ok := store.Get("user")
-	if !ok {
-		return ""
-	}
-	return user.(string)
-}
-
 type Index struct {
 	Auth
+	Flash                               string
 	Articles                            []db.Article
 	Page, PrevPage, NextPage, PageCount int
 }
@@ -49,8 +38,24 @@ func (v Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := isLoggedIn(w, r)
-	v.User = user
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	flash, ok := store.Get("flash")
+	if ok {
+		v.Flash = flash.(string)
+		store.Delete("flash")
+		err := store.Save()
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+	}
+	user, ok := store.Get("user")
+	if ok {
+		v.User = user.(string)
+	}
 
 	page := 1
 	pageQuery := r.FormValue("page")
@@ -100,8 +105,15 @@ type ShowArticle struct {
 }
 
 func (v ShowArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user := isLoggedIn(w, r)
-	v.User = user
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	user, ok := store.Get("user")
+	if ok {
+		v.User = user.(string)
+	}
 
 	slug := r.PathValue("slug")
 	a, err := db.GetArticleBySlug(slug)
@@ -129,9 +141,17 @@ type NewArticle struct {
 }
 
 func (v NewArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user := isLoggedIn(w, r)
-	v.User = user
-	if user == "" {
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	user, ok := store.Get("user")
+	if ok {
+		v.User = user.(string)
+	}
+
+	if v.User == "" {
 		http.Error(w, "Not authenticated", 500)
 		return
 	}
@@ -183,7 +203,7 @@ func (v NewArticle) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", 303)
+	http.Redirect(w, r, "/articles/view/"+a.Slug, 303)
 }
 
 type EditArticle struct {
@@ -193,9 +213,17 @@ type EditArticle struct {
 }
 
 func (v EditArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user := isLoggedIn(w, r)
-	v.User = user
-	if user == "" {
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	user, ok := store.Get("user")
+	if ok {
+		v.User = user.(string)
+	}
+
+	if v.User == "" {
 		http.Error(w, "Not authenticated", 500)
 		return
 	}
@@ -261,17 +289,28 @@ func (v EditArticle) post(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/articles/view/"+a.Slug, 303)
 }
 
-type DeleteArticle struct{}
+type DeleteArticle struct {
+	Auth
+}
 
 func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	user := isLoggedIn(w, r)
-	if user == "" {
-		http.Error(w, "Not authenticated", 500)
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	store, err := session.Start(context.Background(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	user, ok := store.Get("user")
+	if ok {
+		v.User = user.(string)
+	}
+
+	if v.User == "" {
+		http.Error(w, "Not authenticated", 500)
 		return
 	}
 
@@ -280,5 +319,7 @@ func (v DeleteArticle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	flash := fmt.Sprintf("Successfully deleted \"%v\".", slug)
+	store.Set("flash", flash)
 	http.Redirect(w, r, "/", 303)
 }
